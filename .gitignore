@@ -1,0 +1,6 @@
+nrs_lv1_ws/build/
+nrs_lv1_ws/install/
+nrs_lv1_ws/log/
+.pytest_cache/
+__pycache__/
+*.pyc
