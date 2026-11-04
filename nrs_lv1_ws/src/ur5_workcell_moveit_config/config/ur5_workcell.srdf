@@ -175,4 +175,12 @@
     <disable_collisions link1="AGS_finger-med001" link2="AGS_finger-dist002" reason="Allowed"/>
     <disable_collisions link1="AGS_finger-dist001" link2="AGS_finger-med002" reason="Allowed"/>
     <disable_collisions link1="AGS_finger-dist001" link2="AGS_finger-dist002" reason="Allowed"/>
+    
+    <disable_collisions link1="ft300_mounting_plate" link2="ft300_sensor" reason="Adjacent"/>
+    <disable_collisions link1="wrist_3_link" link2="ft300_mounting_plate" reason="Adjacent"/>
+    <disable_collisions link1="ft300_sensor" link2="AGS_wrist" reason="Adjacent"/>
+    <disable_collisions link1="ft300_mounting_plate" link2="AGS_wrist" reason="Never"/>
+    <disable_collisions link1="ft300_sensor" link2="AGS_palm" reason="Never"/>
+
+
 </robot>

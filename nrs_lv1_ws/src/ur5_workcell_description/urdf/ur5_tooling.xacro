@@ -6,7 +6,7 @@
                params="tool0 prefix:='' include_cable_plugs:=true articulated_gripper:=true gripper_joint_damping:=1.0 gripper_joint_friction:=0.1">
     <!-- Students add the FT300S between tool0 and the gripper. -->
     <xacro:property name="ft300_sensor_z" value="0.0415"/>
-    <xacro:property name="ft300_sensor_height" value="0.0375"/>  <!-- PROVJERITI -->
+    <xacro:property name="ft300_sensor_height" value="0.0"/>  <!-- PROVJERITI -->
 
     <!-- 1. FT300S izravno na prirubnicu robota -->
     <xacro:robotiq_ft300s parent="${tool0}" prefix="${prefix}">
