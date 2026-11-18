@@ -14,6 +14,10 @@ np.set_printoptions(precision=4, suppress=True)
 # ---------------- PARAMETRI KOJE BIRAS ----------------
 D_T_TCP = np.eye(4)                      # poza finger_tip u sustavu S_D pri kontaktu
 # primjer druge orijentacije: D_T_TCP[:3, :3] = <rotacijska matrica 3x3>
+D_T_TCP[:3, :3] = np.array([[0, 0, -1],
+                            [-1, 0, 0],
+                            [0, 1, 0]])
+D_T_TCP[:3, 3] = [0.0, 0.0, 0.005] 
 PRE_OFFSET_D = np.array([0.0, 0.0, 0.05])  # pomak pre-contact poze u okviru S_D [m]
 PHIS_DEG = [20, 30, 40, 50, 60, 70]        # kutovi otvorenosti [deg]
 # ------------------------------------------------------
@@ -77,9 +81,13 @@ class Task3Poses(Node):
             return
         try:
             t = self.buf.lookup_transform('tool0', 'finger_tip', rclpy.time.Time())
+            t2 = self.buf.lookup_transform('world', 'base_link', rclpy.time.Time())
+
         except Exception:
             return
         tool0_T_tip = tf_to_matrix(t.transform)
+        W_T_B = tf_to_matrix(t2.transform)
+        B_T_W = np.linalg.inv(W_T_B)
 
         c = self.cfg
         mu = c['axis_pos']
@@ -99,6 +107,8 @@ class Task3Poses(Node):
         W_T_tool0_pre = W_T_TCP_pre @ np.linalg.inv(tool0_T_tip)
         msgs += [matrix_to_msg('tcp_goal_pre', W_T_TCP_pre, stamp),
                  matrix_to_msg('tool0_goal_pre', W_T_tool0_pre, stamp)]
+        B_T_6_pre = B_T_W @ W_T_TCP_pre @ np.linalg.inv(tool0_T_tip)   
+        print(f'pre      B_T_6 translacija: {B_T_6_pre[:3, 3]}')
 
         for phi in PHIS_DEG:
             W_T_TCP = W_T_D(phi) @ D_T_TCP                  # formula (3)
@@ -106,7 +116,9 @@ class Task3Poses(Node):
             msgs += [matrix_to_msg(f'tcp_goal_{phi}', W_T_TCP, stamp),
                      matrix_to_msg(f'tool0_goal_{phi}', W_T_tool0, stamp)]
             print(f'phi={phi:3d}  tool0 u svijetu: {W_T_tool0[:3, 3]}')
-
+            B_T_6 = B_T_W @ W_T_TCP @ np.linalg.inv(tool0_T_tip)
+            
+            print(f'phi={phi:3d}  B_T_6: {B_T_6[:3, 3]}  doseg: {np.linalg.norm(B_T_6[:3, 3]):.3f} m')
         self.br.sendTransform(msgs)
         print('Objavljeno. U RViz-u (TF) prikazi tcp_goal_* i tool0_goal_*.')
         self.done = True
